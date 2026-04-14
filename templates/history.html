@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TrackCrack | Completed History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+<div class="main">
+    <div class="topbar">
+        <h1>Completed Train Track Complaints</h1>
+        <div class="top-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/history/export/csv">Export CSV</a>
+            <a href="/history/export/pdf">Export PDF</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </div>
+
+    <div class="card table-wrap">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Preview</th>
+                    <th>Severity</th>
+                    <th>Location</th>
+                    <th>Description</th>
+                    <th>Created</th>
+                    <th>Completed</th>
+                    <th>Completed By</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <td>#{{ row.id }}</td>
+                    <td><img src="/static/outputs/{{ row.output }}" class="thumb"></td>
+                    <td><span class="sev {{ row.severity|lower }}">{{ row.severity }}</span></td>
+                    <td>
+                        {% if row.map_url %}
+                        <a href="{{ row.map_url }}" target="_blank" rel="noopener noreferrer">{{ row.location }}</a>
+                        {% else %}
+                        {{ row.location }}
+                        {% endif %}
+                    </td>
+                    <td>{{ row.description }}</td>
+                    <td>{{ row.created_at }}</td>
+                    <td>{{ row.completed_at }}</td>
+                    <td>{{ row.completed_by }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

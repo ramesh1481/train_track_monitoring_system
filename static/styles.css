@@ -1,0 +1,266 @@
+body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background: radial-gradient(circle at top left, #111827, #020617 55%);
+    color: #f8fafc;
+}
+
+a {
+    color: #93c5fd;
+    text-decoration: none;
+}
+
+.muted {
+    color: #cbd5e1;
+}
+
+.small {
+    font-size: 0.9rem;
+}
+
+.hint {
+    margin-top: 14px;
+    font-size: 0.9rem;
+    color: #a5b4fc;
+}
+
+.error {
+    color: #fecaca;
+    background: #7f1d1d;
+    border: 1px solid #ef4444;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 230px;
+    background: rgba(2, 6, 23, 0.95);
+    border-right: 1px solid #1e293b;
+    padding: 20px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0 0;
+}
+
+.sidebar li {
+    padding: 12px 10px;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.sidebar li:hover,
+.active {
+    background: #1e293b;
+}
+
+.main {
+    flex: 1;
+    padding: 22px;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.top-links {
+    display: flex;
+    gap: 12px;
+}
+
+.card {
+    background: rgba(30, 41, 59, 0.85);
+    border: 1px solid #334155;
+    padding: 18px;
+    border-radius: 12px;
+}
+
+.upload-card {
+    margin-top: 18px;
+}
+
+.upload-form {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.stats {
+    display: flex;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.open {
+    background: rgba(120, 53, 15, 0.6);
+}
+
+.done {
+    background: rgba(6, 78, 59, 0.6);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 15px;
+}
+
+.item {
+    position: relative;
+    cursor: pointer;
+}
+
+.item img {
+    width: 100%;
+    height: 210px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid #334155;
+    transition: transform 0.2s ease;
+}
+
+.item:hover img {
+    transform: scale(1.02);
+}
+
+.info {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
+    background: rgba(2, 6, 23, 0.76);
+    border-radius: 8px;
+    padding: 8px 10px;
+    display: grid;
+    gap: 4px;
+}
+
+.info small {
+    color: #cbd5e1;
+}
+
+.sev.low {
+    color: #22c55e;
+    font-weight: 700;
+}
+
+.sev.medium {
+    color: #f59e0b;
+    font-weight: 700;
+}
+
+.sev.high {
+    color: #ef4444;
+    font-weight: 700;
+}
+
+.btn {
+    margin-top: 4px;
+    padding: 10px 16px;
+    background: linear-gradient(90deg, #22c55e, #14b8a6);
+    border: none;
+    border-radius: 8px;
+    color: #0f172a;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+input {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #475569;
+    background: #0f172a;
+    color: #f8fafc;
+}
+
+select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #475569;
+    background: #0f172a;
+    color: #f8fafc;
+}
+
+.chart-card {
+    min-width: 300px;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.93);
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 10;
+}
+
+.modal img {
+    max-width: 80%;
+    max-height: 70vh;
+    border-radius: 10px;
+    border: 2px solid #334155;
+}
+
+#modal-data {
+    margin-top: 14px;
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid #334155;
+    padding: 12px 14px;
+    border-radius: 10px;
+}
+
+.close {
+    position: absolute;
+    top: 20px;
+    right: 40px;
+    font-size: 34px;
+    cursor: pointer;
+}
+
+.login-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-card {
+    width: min(420px, 92vw);
+}
+
+.table-wrap {
+    margin-top: 18px;
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th,
+.table td {
+    border-bottom: 1px solid #334155;
+    padding: 10px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.thumb {
+    width: 95px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #334155;
+}

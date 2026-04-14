@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TrackCrack | Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <h2>TrackCrack</h2>
+        <p class="muted small">Welcome, {{ session['user'] }} ({{ session['role']|upper }})</p>
+        <ul>
+            <li class="active" onclick="showAll()">All Complaints</li>
+            <li onclick="filterStatus('OPEN')">Open</li>
+            <li onclick="filterStatus('COMPLETED')">Completed</li>
+            <li onclick="filterSeverity('HIGH')">High Severity</li>
+            <li onclick="filterSeverity('MEDIUM')">Medium Severity</li>
+            <li><a href="/history">Completed History</a></li>
+            {% if session['role'] == 'admin' %}
+            <li><a href="/users">User Management</a></li>
+            {% endif %}
+        </ul>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <h1>Train Track Crack Complaint Tracker</h1>
+            <div class="top-links">
+                <a href="/history">History</a>
+                {% if session['role'] == 'admin' %}
+                <a href="/users">Users</a>
+                {% endif %}
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+
+        <div class="card upload-card">
+            <h3>Create New Complaint</h3>
+            <form action="/upload" method="post" enctype="multipart/form-data" class="upload-form">
+                <input type="text" name="location" placeholder="Track location (station/segment)" required>
+                <input type="text" name="description" placeholder="Short damage description" required>
+                <input type="file" name="image" accept="image/*" required>
+                <button class="btn">Upload & Analyze</button>
+            </form>
+        </div>
+
+        <div class="card upload-card">
+            <h3>Search & Filter</h3>
+            <form method="get" action="/dashboard" class="upload-form">
+                <input type="text" name="search" placeholder="Search location/description" value="{{ filters.search }}">
+                <select name="status">
+                    <option value="">Any Status</option>
+                    <option value="OPEN" {% if filters.status == "OPEN" %}selected{% endif %}>Open</option>
+                    <option value="COMPLETED" {% if filters.status == "COMPLETED" %}selected{% endif %}>Completed</option>
+                </select>
+                <select name="severity">
+                    <option value="">Any Severity</option>
+                    <option value="LOW" {% if filters.severity == "LOW" %}selected{% endif %}>Low</option>
+                    <option value="MEDIUM" {% if filters.severity == "MEDIUM" %}selected{% endif %}>Medium</option>
+                    <option value="HIGH" {% if filters.severity == "HIGH" %}selected{% endif %}>High</option>
+                </select>
+                <input type="date" name="start_date" value="{{ filters.start_date }}">
+                <input type="date" name="end_date" value="{{ filters.end_date }}">
+                <button class="btn">Apply Filters</button>
+            </form>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats">
+            <div class="card">Total<br>{{ data|length }}</div>
+            <div class="card open">Open<br>{{ open_count }}</div>
+            <div class="card done">Done<br>{{ completed_count }}</div>
+            <div class="card chart-card">
+                <canvas id="severityChart" height="70"></canvas>
+            </div>
+        </div>
+
+        <!-- GRID -->
+        <div class="grid" id="grid">
+
+            {% for row in data %}
+            <div class="item"
+                 data-status="{{ row.status }}"
+                 data-severity="{{ row.severity }}"
+                 onclick="openModal(
+                    '{{ row.output }}',
+                    '{{ row.severity }}',
+                    '{{ row.status }}',
+                    '{{ row.id }}',
+                    '{{ row.created_at }}',
+                    '{{ row.completed_at }}',
+                    '{{ row.completed_by }}',
+                    '{{ row.location }}',
+                    '{{ row.description }}'
+                 )">
+
+                <img src="/static/outputs/{{ row.output }}">
+
+                <div class="info">
+                    <span class="sev {{ row.severity|lower }}">{{ row.severity }}</span>
+                    <span>{{ row.status }}</span>
+                    <small>
+                        {% if row.map_url %}
+                        <a href="{{ row.map_url }}" target="_blank" rel="noopener noreferrer">{{ row.location }}</a>
+                        {% else %}
+                        {{ row.location }}
+                        {% endif %}
+                    </small>
+                    <small>{{ row.created_at }}</small>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+
+    </main>
+
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="modal">
+    <span onclick="closeModal()" class="close">×</span>
+    <img id="modal-img">
+    <div id="modal-data"></div>
+    <button id="completeBtn" class="btn" onclick="markComplete()">Mark Completed</button>
+</div>
+
+<script>
+let currentId = null;
+const canComplete = {{ 'true' if can_complete else 'false' }};
+
+function openModal(img, severity, status, id, createdAt, completedAt, completedBy, location, description) {
+    currentId = id;
+    document.getElementById("modal").style.display = "flex";
+    document.getElementById("modal-img").src = "/static/outputs/" + img;
+
+    const coordMatch = /(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/.exec(location || "");
+    const mapUrl = coordMatch ? `https://www.google.com/maps?q=${coordMatch[1]},${coordMatch[2]}` : null;
+    const locationHtml = mapUrl
+        ? `<a href="${mapUrl}" target="_blank" rel="noopener noreferrer">${location}</a>`
+        : location;
+
+    document.getElementById("modal-data").innerHTML =
+        `<h2>Severity: ${severity}</h2>
+         <p>Status: ${status}</p>
+         <p>Location: ${locationHtml}</p>
+         <p>Description: ${description}</p>
+         <p>Created: ${createdAt}</p>
+         <p>Completed: ${completedAt}</p>
+         <p>Completed by: ${completedBy}</p>`;
+
+    document.getElementById("completeBtn").style.display = (status === "OPEN" && canComplete)
+        ? "inline-block"
+        : "none";
+}
+
+function closeModal() {
+    document.getElementById("modal").style.display = "none";
+}
+
+function markComplete() {
+    if(currentId) {
+        window.location.href = "/complete/" + currentId;
+    }
+}
+
+function showAll() {
+    let items = document.querySelectorAll(".item");
+    items.forEach(i => i.style.display = "block");
+}
+
+/* FILTERS */
+function filterStatus(status) {
+    let items = document.querySelectorAll(".item");
+    items.forEach(i => {
+        i.style.display = (i.dataset.status === status) ? "block" : "none";
+    });
+}
+
+function filterSeverity(sev) {
+    let items = document.querySelectorAll(".item");
+    items.forEach(i => {
+        i.style.display = (i.dataset.severity === sev) ? "block" : "none";
+    });
+}
+
+// Mini chart without external dependency.
+const severityCounts = {{ severity_counts_json|safe }};
+const canvas = document.getElementById("severityChart");
+if (canvas) {
+    const ctx = canvas.getContext("2d");
+    const labels = ["LOW", "MEDIUM", "HIGH"];
+    const colors = ["#22c55e", "#f59e0b", "#ef4444"];
+    const values = labels.map((k) => severityCounts[k] || 0);
+    const max = Math.max(...values, 1);
+    const w = canvas.width = 280;
+    const h = canvas.height = 80;
+    ctx.clearRect(0, 0, w, h);
+    labels.forEach((label, i) => {
+        const x = 20 + i * 85;
+        const barH = (values[i] / max) * 45;
+        const y = 55 - barH;
+        ctx.fillStyle = colors[i];
+        ctx.fillRect(x, y, 30, barH);
+        ctx.fillStyle = "#e2e8f0";
+        ctx.fillText(label, x - 2, 72);
+        ctx.fillText(String(values[i]), x + 8, y - 4);
+    });
+}
+</script>
+
+</body>
+</html>

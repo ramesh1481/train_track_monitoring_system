@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TrackCrack Sensor Uploader</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; }
+    .card { border: 1px solid #ddd; border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+    input, button { width: 100%; padding: 10px; margin-top: 8px; box-sizing: border-box; }
+    button { cursor: pointer; }
+    pre { background: #111; color: #0f0; padding: 12px; border-radius: 8px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <h1>TrackCrack Sensor Uploader</h1>
+  <p>This static page is hosted on GitHub Pages. Backend API must run on Raspberry Pi/server.</p>
+
+  <div class="card">
+    <h3>Send Test Capture</h3>
+    <input id="apiUrl" placeholder="API URL (e.g. http://server-ip:5000/api/pi-capture)" />
+    <input id="token" placeholder="X-API-Token" />
+    <input id="lat" placeholder="Latitude (optional)" />
+    <input id="lon" placeholder="Longitude (optional)" />
+    <input id="image" type="file" accept="image/*" />
+    <button onclick="sendCapture()">Send</button>
+  </div>
+
+  <pre id="out">Waiting...</pre>
+
+  <script>
+    async function sendCapture() {
+      const apiUrl = document.getElementById("apiUrl").value.trim();
+      const token = document.getElementById("token").value.trim();
+      const lat = document.getElementById("lat").value.trim();
+      const lon = document.getElementById("lon").value.trim();
+      const file = document.getElementById("image").files[0];
+      const out = document.getElementById("out");
+
+      if (!apiUrl || !token || !file) {
+        out.textContent = "API URL, token and image are required.";
+        return;
+      }
+
+      const form = new FormData();
+      form.append("image", file);
+      form.append("ir_triggered", "true");
+      form.append("description", "Manual test from GitHub Pages");
+      if (lat && lon) {
+        form.append("latitude", lat);
+        form.append("longitude", lon);
+      }
+
+      try {
+        const res = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "X-API-Token": token },
+          body: form
+        });
+        const json = await res.json();
+        out.textContent = JSON.stringify(json, null, 2);
+      } catch (err) {
+        out.textContent = "Request failed: " + err;
+      }
+    }
+  </script>
+</body>
+</html>
