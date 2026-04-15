@@ -18,7 +18,7 @@ except Exception:
     DigitalInputDevice = None
 
 
-API_URL = os.getenv("TRACKCRACK_API_URL", "http://127.0.0.1:5000/api/pi-capture")
+API_URL = os.getenv("TRACKCRACK_API_URL", "https://train-track-monitoring-system.onrender.com/api/pi-capture")
 API_TOKEN = os.getenv("TRACKCRACK_API_TOKEN", "changeme-token")
 IR_GPIO_PIN = int(os.getenv("IR_GPIO_PIN", "17"))
 GPS_SERIAL_PORT = os.getenv("GPS_SERIAL_PORT", "/dev/ttyAMA0")
